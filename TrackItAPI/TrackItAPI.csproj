@@ -5,14 +5,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.3" />
-    <PackageReference Include="Dapper" Version="2.0.123" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="6.0.3"/>
+    <PackageReference Include="Dapper" Version="2.0.123"/>
+    <PackageReference Include="MQTTnet" Version="3.1.2"/>
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(ProjectDir)Database/Migrations/**" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(ProjectDir)Database/Migrations/**" CopyToOutputDirectory="PreserveNewest"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TrackItCommon\TrackItCommon.csproj" />
+    <ProjectReference Include="..\TrackItCommon\TrackItCommon.csproj"/>
   </ItemGroup>
 </Project>

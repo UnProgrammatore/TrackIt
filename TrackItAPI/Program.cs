@@ -2,6 +2,8 @@ using TrackItAPI.Configuration;
 using TrackItAPI.Database;
 using TrackItAPI.Database.Repositories;
 using TrackItAPI.Database.Repositories.Impl;
+using TrackItAPI.Database.TypeMappers;
+using TrackItAPI.QueueManagement;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,9 +25,14 @@ if(env is not null)
 config = config.AddEnvironmentVariables();
 
 builder.Services.Configure<DatabaseConfiguration>(builder.Configuration.GetSection("Database"));
+builder.Services.Configure<MQTTConfiguration>(builder.Configuration.GetSection("MQTT"));
 
 builder.Services.AddSingleton<SQLiteVersioning>();
 builder.Services.AddSingleton<ITrackingRepository, TrackingRepository>();
+
+builder.Services.AddSingleton<QueueManager>();
+
+DateTimeTypeMapper.Set();
 
 var app = builder.Build();
 
@@ -44,5 +51,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.Services.GetService<SQLiteVersioning>()!.UpdateDatabaseAsync();
+await app.Services.GetService<QueueManager>()!.StartAsync(CancellationToken.None);
 
 app.Run();

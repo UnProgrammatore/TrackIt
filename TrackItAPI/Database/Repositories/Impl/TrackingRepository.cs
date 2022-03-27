@@ -48,7 +48,7 @@ public class TrackingRepository : ITrackingRepository
     public Task AddPositionAsync(string trackerCode, Position position)
     {
         using var conn = GetConnection();
-        return conn.ExecuteAsync("INSERT INTO Positions (TrackerId, Latitude, Longitude, CollectDate) SELECT TrackerID, @Latitude, @Longitude, @CollectDate FROM Trackers WHERE TrackerCode = @trackerCode", 
+        return conn.ExecuteAsync("INSERT INTO Positions (TrackerId, Latitude, Longitude, CollectDate) SELECT Id, @Latitude, @Longitude, @CollectDate FROM Trackers WHERE Code = @trackerCode", 
             new { trackerCode, position.Latitude, position.Longitude, position.CollectDate }
         );
     }
