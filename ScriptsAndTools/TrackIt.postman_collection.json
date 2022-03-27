@@ -1,0 +1,80 @@
+{
+	"info": {
+		"_postman_id": "39a5f43a-0650-4754-9198-58b6ceb3c9bd",
+		"name": "TrackIt",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get all trackers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5002/trackers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"trackers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post a tracker",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Code\": \"tt\",\n    \"Name\": \"Console tracker\",\n    \"Notes\": \"A fake tracker populated by a script\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5002/trackers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"trackers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get last 10 positions for tracker",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5002/positions/tt/last/10/startfrom/0",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5002",
+					"path": [
+						"positions",
+						"tt",
+						"last",
+						"10",
+						"startfrom",
+						"0"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
