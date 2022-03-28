@@ -31,6 +31,7 @@ builder.Services.AddSingleton<SQLiteVersioning>();
 builder.Services.AddSingleton<ITrackingRepository, TrackingRepository>();
 
 builder.Services.AddSingleton<QueueManager>();
+builder.Services.AddSingleton<MQTTServer>();
 
 DateTimeTypeMapper.Set();
 
@@ -51,6 +52,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 await app.Services.GetService<SQLiteVersioning>()!.UpdateDatabaseAsync();
+await app.Services.GetService<MQTTServer>()!.StartAsync(CancellationToken.None);
 await app.Services.GetService<QueueManager>()!.StartAsync(CancellationToken.None);
 
 app.Run();
