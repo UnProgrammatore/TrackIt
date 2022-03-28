@@ -8,20 +8,8 @@ using TrackItAPI.Database.Repositories;
 
 namespace TrackItAPI.QueueManagement;
 
-public class QueueManager 
+public class QueueManager : IMqttApplicationMessageReceivedHandler
 {
-    public class Handler : IMqttApplicationMessageReceivedHandler
-    {
-        private readonly Func<MqttApplicationMessageReceivedEventArgs, Task> _handler;
-        public Handler(Func<MqttApplicationMessageReceivedEventArgs, Task> handler)
-        {
-            _handler = handler;
-        }
-        
-        public Task HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
-            => _handler(eventArgs);
-    }
-
     private readonly ITrackingRepository _trackingRepository;
     private readonly IOptions<MQTTConfiguration> _mqttConfiguration;
     private readonly ILogger<QueueManager> _logger;
@@ -32,6 +20,35 @@ public class QueueManager
         _logger = logger;
     }
 
+    async Task IMqttApplicationMessageReceivedHandler.HandleApplicationMessageReceivedAsync(MqttApplicationMessageReceivedEventArgs eventArgs)
+    {
+        var msg = eventArgs.ApplicationMessage;
+        var msgContent = msg.Payload;
+        TrackerMessage tm;
+        try 
+        {
+            tm = TrackerMessage.FromMessageBytes(msgContent);
+        }
+        catch(Exception ex) 
+        {
+            _logger.LogError(ex, "Received invalid message", msg);
+            return;
+        }
+
+        var position = tm.ToPosition(DateTime.UtcNow);
+
+        try 
+        {
+            await _trackingRepository.AddPositionAsync(tm.TrackerCode, position);
+        }
+        catch(Exception ex) 
+        {
+            _logger.LogError(ex, "Failed to add position", position);
+        }
+        await eventArgs.AcknowledgeAsync(CancellationToken.None);
+    }
+    
+    
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         var factory = new MqttFactory();
@@ -44,33 +61,7 @@ public class QueueManager
         
         var client = factory.CreateMqttClient();
 
-        client.ApplicationMessageReceivedHandler = new Handler(async (eventArgs) => 
-        {
-            var msg = eventArgs.ApplicationMessage;
-            var msgContent = msg.Payload;
-            TrackerMessage tm;
-            try 
-            {
-                tm = TrackerMessage.FromMessageBytes(msgContent);
-            }
-            catch(Exception ex) 
-            {
-                _logger.LogError(ex, "Received invalid message", msg);
-                return;
-            }
-
-            var position = tm.ToPosition(DateTime.UtcNow);
-
-            try 
-            {
-                await _trackingRepository.AddPositionAsync(tm.TrackerCode, position);
-            }
-            catch(Exception ex) 
-            {
-                _logger.LogError(ex, "Failed to add position", position);
-            }
-            await eventArgs.AcknowledgeAsync(CancellationToken.None);
-        });
+        client.ApplicationMessageReceivedHandler = this;
 
         await client.ConnectAsync(clientOptions, cancellationToken);
 
