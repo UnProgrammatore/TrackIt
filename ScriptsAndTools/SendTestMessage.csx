@@ -1,4 +1,4 @@
-#r "nuget: MQTTnet, 3.1.2"
+#r "Nuget: MQTTnet, 3.1.2"
 using System.Globalization;
 using System.Threading;
 using MQTTnet;
